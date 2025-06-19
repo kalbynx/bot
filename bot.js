@@ -25,6 +25,14 @@ let users = {
         username: "testuser",
         phoneNumber: "0987654321"
     },
+
+   
+    "8164681148": {
+        chatId: "8164681148",
+        balance: 7000,
+        username: "kkk",
+        phoneNumber: "0987654321"
+    },
         "1133538088": {  // New user from the URL
         chatId: "1133538088",
         balance: 1900,
