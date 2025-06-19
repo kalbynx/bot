@@ -10,6 +10,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   next();
 });
+
 // Mock database
 let users = {
     "123456789": {
@@ -26,20 +27,19 @@ let users = {
         phoneNumber: "0987654321"
     },
 
-   
     "8164681148": {
         chatId: "8164681148",
         balance: 7000,
         username: "kkk",
         phoneNumber: "0987654321"
     },
-        "1133538088": {  // New user from the URL
+    "1133538088": {
         chatId: "1133538088",
         balance: 1900,
         username: "SonofGod26",
         firstName: "KB",
         lastName: "",
-        phoneNumber: "0912345678" // Adding a mock phone number
+        phoneNumber: "0912345678"
     }
 };
 
@@ -56,7 +56,53 @@ const authenticate = (req, res, next) => {
     next();
 };
 
-// 2.1 Get User Details
+// 1. Add/Update User Endpoint
+app.post('/api/userinfo/add', authenticate, (req, res) => {
+    const { chatId, balance, username, phoneNumber, firstName, lastName } = req.body;
+    
+    if (!chatId) {
+        return res.status(400).json({ error: 'chatId is required' });
+    }
+    
+    // Create or update user
+    users[chatId] = {
+        chatId,
+        balance: balance || 0,
+        username: username || '',
+        phoneNumber: phoneNumber || '',
+        firstName: firstName || '',
+        lastName: lastName || ''
+    };
+    
+    res.json({
+        success: true,
+        user: users[chatId]
+    });
+});
+
+// 2. Get All Users (for debugging/admin purposes)
+app.get('/api/userinfo/all', authenticate, (req, res) => {
+    res.json({
+        users: users
+    });
+});
+
+// 3. Delete User Endpoint
+app.delete('/api/userinfo/delete/:chatId', authenticate, (req, res) => {
+    const chatId = req.params.chatId;
+    
+    if (!users[chatId]) {
+        return res.status(404).json({ error: 'User not found' });
+    }
+    
+    delete users[chatId];
+    res.json({
+        success: true,
+        message: `User ${chatId} deleted`
+    });
+});
+
+// 2.1 Get User Details (existing)
 app.get('/api/userinfo/get/:chatId', authenticate, (req, res) => {
     const chatId = req.params.chatId;
     const user = users[chatId];
@@ -70,7 +116,9 @@ app.get('/api/userinfo/get/:chatId', authenticate, (req, res) => {
             chatId: user.chatId,
             balance: user.balance,
             username: user.username,
-            phoneNumber: user.phoneNumber
+            phoneNumber: user.phoneNumber,
+            firstName: user.firstName,
+            lastName: user.lastName
         }
     });
 });
@@ -197,4 +245,8 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Mock Game Wallet API server running on port ${PORT}`);
     console.log(`Base URL: http://localhost:${PORT}`);
+    console.log('Available user management endpoints:');
+    console.log(`- POST http://localhost:${PORT}/api/userinfo/add - Add/update a user`);
+    console.log(`- GET http://localhost:${PORT}/api/userinfo/all - Get all users`);
+    console.log(`- DELETE http://localhost:${PORT}/api/userinfo/delete/:chatId - Delete a user`);
 });
