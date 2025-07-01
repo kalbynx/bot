@@ -143,10 +143,7 @@ app.post('/api/operator/wallet/debit', authenticate, (req, res) => {
     }
     
     // Check for duplicate round_id
-    const existingTx = transactions.find(tx => tx.round_id === round_id && tx.transaction_type === 'debit');
-    if (existingTx) {
-        return res.status(400).json({ error: 'Duplicate round_id detected' });
-    }
+
     
     // Check sufficient balance
     if (user.balance < amount) {
