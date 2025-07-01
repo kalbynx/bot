@@ -267,10 +267,7 @@ app.post('/api/operator/wallet/credit/rollback', authenticate, (req, res) => {
     }
     
     // Check for duplicate round_id for rollback
-    const existingRollbackTx = transactions.find(tx => tx.round_id === round_id && tx.transaction_type === 'rollback');
-    if (existingRollbackTx) {
-        return res.status(400).json({ error: 'Duplicate round_id detected for rollback transaction' });
-    }
+   
     
     // Check if corresponding debit exists
     const correspondingDebit = transactions.find(tx => 
